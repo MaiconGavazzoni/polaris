@@ -12,6 +12,16 @@ export const helloWorld = inngest.createFunction(
   },
 )
 
+export const demoError = inngest.createFunction(
+  { id: "demo-error" },
+  { event: "demo/error" },
+  async ({ step }) => {
+    await step.run("fail", async () => {
+      throw new Error("Inngest Error: Background job failed!")
+    })
+  },
+)
+
 const URL_REGEX = /https?:\/\/[^\s]+/g
 
 export const demoGenerate = inngest.createFunction(
@@ -49,6 +59,11 @@ export const demoGenerate = inngest.createFunction(
       return await generateText({
         model: google("gemini-2.5-flash"),
         prompt: finalPrompt,
+        experimental_telemetry: {
+          isEnabled: true,
+          recordInputs: true,
+          recordOutputs: true,
+        },
       })
     })
   },
